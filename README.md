@@ -108,8 +108,8 @@ logs shipped to a centralized S3 bucket with Object Lock enabled.
 
 Built by Beth Gerharts as a GRC portfolio project demonstrating AI-assisted security control assessment for cloud environments.
 
-- [LinkedIn](https://linkedin.com/in/YOUR_PROFILE)
-- [GitHub](https://github.com/YOUR_USERNAME)
+- [LinkedIn](https://linkedin.com/in/beth-gerharts)
+- [GitHub](https://github.com/bettybangs)
 
 ---
 
