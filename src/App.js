@@ -78,7 +78,7 @@ const styles = `
   .copy-btn:hover { border-color: #6eccc0; color: #6eccc0; }
   .history-item { background: #1e1e1e; border: 1px solid #2a2a2a; border-radius: 8px; padding: 0.6rem 0.9rem; cursor: pointer; transition: border-color 0.2s; }
   .history-item:hover { border-color: #c17f3a; }
-  .example-btn { background: none; border: 1px solid #2a2a2a; color: #555; font-size: 12px; padding: 5px 12px; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-family: inherit; text-align: left; }
+  .example-btn { background: none; border: 1px solid #c17f3a; color: #c17f3a; font-size: 12px; padding: 5px 12px; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-family: inherit; text-align: left; }
   .example-btn:hover { border-color: #c17f3a; color: #c17f3a; }
   .help-step { display: flex; gap: 12px; padding: 0.6rem 0; border-bottom: 1px solid #2a2a2a; }
   .help-step:last-child { border-bottom: none; }
