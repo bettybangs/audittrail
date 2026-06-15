@@ -4,7 +4,10 @@
 
 AuditTrail is a GRC portfolio tool that uses Claude AI to assess security controls against major compliance frameworks. Paste in a control description or system detail and instantly receive assessment questions, evidence requirements, potential weaknesses with remediation recommendations, and framework control mappings — the same outputs a senior GRC analyst would produce manually.
 
+![AuditTrail Screenshot](audittrail-screenshot.png)
+
 ---
+
 
 ## What It Does
 
@@ -51,7 +54,7 @@ AWS · AWS GovCloud · Azure · Azure Government · GCP · Oracle Cloud (OCI) ·
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/audittrail.git
+   git clone https://github.com/bettybangs/audittrail.git
    cd audittrail
    ```
 
