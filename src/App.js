@@ -78,7 +78,7 @@ const styles = `
   .copy-btn:hover { border-color: #6eccc0; color: #6eccc0; }
   .history-item { background: #1e1e1e; border: 1px solid #2a2a2a; border-radius: 8px; padding: 0.6rem 0.9rem; cursor: pointer; transition: border-color 0.2s; }
   .history-item:hover { border-color: #c17f3a; }
-  .example-btn { background: none; border: 1px solid #c17f3a; color: #c17f3a; font-size: 12px; padding: 5px 12px; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-family: inherit; text-align: left; }
+  .example-btn { background: #1a1400; border: 1px solid #c8a830; color: #c8a830; font-size: 12px; padding: 5px 12px; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-family: inherit; text-align: left; }
   .example-btn:hover { border-color: #c17f3a; color: #c17f3a; }
   .help-step { display: flex; gap: 12px; padding: 0.6rem 0; border-bottom: 1px solid #2a2a2a; }
   .help-step:last-child { border-bottom: none; }
@@ -273,7 +273,7 @@ export default function App() {
               style={{ width: "100%", minHeight: 130, padding: "0.75rem", borderRadius: 8, fontSize: 14, resize: "vertical", fontFamily: "inherit", boxSizing: "border-box" }}
             />
             <div style={{ marginTop: 8, marginBottom: 12 }}>
-              <p style={{ fontSize: 11, color: "#555", margin: "0 0 6px", letterSpacing: "0.06em", fontWeight: 700 }}>LOAD AN EXAMPLE</p>
+              <p style={{ fontSize: 11, color: "#c8a830", margin: "0 0 6px", letterSpacing: "0.06em", fontWeight: 700 }}>LOAD AN EXAMPLE</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                 {EXAMPLES.map(function(ex, i) {
                   return (
