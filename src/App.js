@@ -83,6 +83,8 @@ const styles = `
   .help-step { display: flex; gap: 12px; padding: 0.6rem 0; border-bottom: 1px solid #2a2a2a; }
   .help-step:last-child { border-bottom: none; }
   .step-num { width: 22px; height: 22px; border-radius: 50%; background: #c17f3a; color: #1a1400; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  @keyframes spin { 0%{opacity:1} 33%{opacity:0.3} 66%{opacity:0.3} 100%{opacity:1} }
+.dot1{animation:spin 1.2s infinite} .dot2{animation:spin 1.2s 0.4s infinite} .dot3{animation:spin 1.2s 0.8s infinite}
   @media print { .no-print { display: none !important; } body { background: white !important; color: black !important; } }
 `;
 
@@ -129,8 +131,18 @@ export default function App() {
         return [{ input: input.substring(0, 80) + "...", env: env, framework: framework, result: parsed, timestamp: new Date().toLocaleTimeString() }, ...prev.slice(0, 9)];
       });
     } catch (e) {
-      setError(e.message);
-    }
+  if (e.message?.includes("401") || e.message?.includes("invalid x-api-key") || e.message?.includes("authentication")) {
+    setError("Invalid API key. Check your REACT_APP_ANTHROPIC_API_KEY in .env");
+  } else if (e.message?.includes("429") || e.message?.includes("rate")) {
+    setError("Rate limit hit. Wait 30 seconds and try again.");
+  } else if (e.message?.includes("fetch") || e.message?.includes("network") || e.message?.includes("Failed")) {
+    setError("Network error. Check your internet connection and try again.");
+  } else if (e.message?.includes("JSON")) {
+    setError("Unexpected response from Claude. Try again or simplify your input.");
+  } else {
+    setError(e.message || "Something went wrong. Please try again.");
+  }
+}
     setLoading(false);
   }
 
@@ -297,7 +309,14 @@ export default function App() {
             </div>
             <button onClick={assess} disabled={loading || !input.trim()} className="assess-btn"
               style={{ width: "100%", marginTop: 12, padding: "0.75rem", borderRadius: 8, fontSize: 14, cursor: "pointer" }}>
-              {loading ? "Analyzing control..." : "Assess control"}
+              {loading ? (
+  <span style={{display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>
+    Analyzing control
+    <span className="dot1" style={{fontSize:18,lineHeight:1}}>.</span>
+    <span className="dot2" style={{fontSize:18,lineHeight:1}}>.</span>
+    <span className="dot3" style={{fontSize:18,lineHeight:1}}>.</span>
+  </span>
+) : "Assess control"}
             </button>
           </div>
 
