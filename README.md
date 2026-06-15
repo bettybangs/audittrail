@@ -4,7 +4,7 @@
 
 Risk Whisperer is a GRC portfolio tool that uses Claude AI to assess security controls against major compliance frameworks. Paste in a control description or system detail and instantly receive assessment questions, evidence requirements, potential weaknesses with remediation recommendations, and framework control mappings — the same outputs a senior GRC analyst would produce manually.
 
-![Risk Whisperer Screenshot](Risk Whisperer-screenshot.png)
+![Risk Whisperer Screenshot](risk-whisperer-screenshot.png)
 
 ---
 
