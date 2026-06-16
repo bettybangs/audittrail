@@ -397,15 +397,13 @@ export default function App() {
                   })}
                 </ul>
               </Card>
-            </div>
-          )}
+            </div><div style={{ maxWidth: 820, margin: "2rem auto 0", padding: "1rem", borderTop: "1px solid #2a2a2a", textAlign: "center" }}>
+          <p style={{ fontSize: 11, color: "#444", margin: 0, lineHeight: 1.6 }}>
+            Risk Whisperer is a portfolio and educational tool. Outputs should be reviewed by a qualified GRC professional before use in formal audits or compliance programs.
+          </p>
         </div>
-      </div>
-    </>
-  );
-}
-
-function Card({ title, accent, children, onCopy, copied }) {
+          )}
+        ({ title, accent, children, onCopy, copied }) {
   const [open, setOpen] = useState(false);
   return (
     <div style={{ background: "#242424", border: "1px solid #333", borderRadius: 12, overflow: "hidden" }}>
