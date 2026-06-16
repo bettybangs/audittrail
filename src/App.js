@@ -84,7 +84,7 @@ const styles = `
   .help-step:last-child { border-bottom: none; }
   .step-num { width: 22px; height: 22px; border-radius: 50%; background: #c17f3a; color: #1a1400; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
   @keyframes spin { 0%{opacity:1} 33%{opacity:0.3} 66%{opacity:0.3} 100%{opacity:1} }
-.dot1{animation:spin 1.2s infinite} .dot2{animation:spin 1.2s 0.4s infinite} .dot3{animation:spin 1.2s 0.8s infinite}
+  .dot1{animation:spin 1.2s infinite} .dot2{animation:spin 1.2s 0.4s infinite} .dot3{animation:spin 1.2s 0.8s infinite}
   @media print { .no-print { display: none !important; } body { background: white !important; color: black !important; } }
 `;
 
@@ -131,18 +131,18 @@ export default function App() {
         return [{ input: input.substring(0, 80) + "...", env: env, framework: framework, result: parsed, timestamp: new Date().toLocaleTimeString() }, ...prev.slice(0, 9)];
       });
     } catch (e) {
-  if (e.message?.includes("401") || e.message?.includes("invalid x-api-key") || e.message?.includes("authentication")) {
-    setError("Invalid API key. Check your REACT_APP_ANTHROPIC_API_KEY in .env");
-  } else if (e.message?.includes("429") || e.message?.includes("rate")) {
-    setError("Rate limit hit. Wait 30 seconds and try again.");
-  } else if (e.message?.includes("fetch") || e.message?.includes("network") || e.message?.includes("Failed")) {
-    setError("Network error. Check your internet connection and try again.");
-  } else if (e.message?.includes("JSON")) {
-    setError("Unexpected response from Claude. Try again or simplify your input.");
-  } else {
-    setError(e.message || "Something went wrong. Please try again.");
-  }
-}
+      if (e.message?.includes("401") || e.message?.includes("invalid x-api-key") || e.message?.includes("authentication")) {
+        setError("Invalid API key. Check your REACT_APP_ANTHROPIC_API_KEY in .env");
+      } else if (e.message?.includes("429") || e.message?.includes("rate")) {
+        setError("Rate limit hit. Wait 30 seconds and try again.");
+      } else if (e.message?.includes("fetch") || e.message?.includes("network") || e.message?.includes("Failed")) {
+        setError("Network error. Check your internet connection and try again.");
+      } else if (e.message?.includes("JSON")) {
+        setError("Unexpected response from Claude. Try again or simplify your input.");
+      } else {
+        setError(e.message || "Something went wrong. Please try again.");
+      }
+    }
     setLoading(false);
   }
 
@@ -187,8 +187,8 @@ export default function App() {
           </div>
 
           <h1 style={{ fontSize: 30, fontWeight: 700, margin: "0", paddingBottom: "2px", color: "#f5ead8" }}>Risk Whisperer</h1>
-<p style={{ color: "#aaa", margin: "2px 0 1rem", fontSize: 16 }}>Know your risks before your auditor does.</p>
-<p style={{ color: "#555", marginBottom: "1.5rem", fontSize: 12 }}>AI-powered security control assessor · {framework} · {env}</p>
+          <p style={{ color: "#aaa", margin: "2px 0 1rem", fontSize: 16 }}>Know your risks before your auditor does.</p>
+          <p style={{ color: "#555", marginBottom: "1.5rem", fontSize: 12 }}>AI-powered security control assessor · {framework} · {env}</p>
 
           {showHelp && (
             <div style={{ background: "#242424", border: "1px solid #333", borderRadius: 12, padding: "1.25rem", marginBottom: "1rem" }} className="no-print">
@@ -311,13 +311,13 @@ export default function App() {
             <button onClick={assess} disabled={loading || !input.trim()} className="assess-btn"
               style={{ width: "100%", marginTop: 12, padding: "0.75rem", borderRadius: 8, fontSize: 14, cursor: "pointer" }}>
               {loading ? (
-  <span style={{display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>
-    Analyzing control
-    <span className="dot1" style={{fontSize:18,lineHeight:1}}>.</span>
-    <span className="dot2" style={{fontSize:18,lineHeight:1}}>.</span>
-    <span className="dot3" style={{fontSize:18,lineHeight:1}}>.</span>
-  </span>
-) : "Assess control"}
+                <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>
+                  Analyzing control
+                  <span className="dot1" style={{ fontSize: 18, lineHeight: 1 }}>.</span>
+                  <span className="dot2" style={{ fontSize: 18, lineHeight: 1 }}>.</span>
+                  <span className="dot3" style={{ fontSize: 18, lineHeight: 1 }}>.</span>
+                </span>
+              ) : "Assess control"}
             </button>
           </div>
 
@@ -397,13 +397,22 @@ export default function App() {
                   })}
                 </ul>
               </Card>
-            </div><div style={{ maxWidth: 820, margin: "2rem auto 0", padding: "1rem", borderTop: "1px solid #2a2a2a", textAlign: "center" }}>
-          <p style={{ fontSize: 11, color: "#444", margin: 0, lineHeight: 1.6 }}>
-            Risk Whisperer is a portfolio and educational tool. Outputs should be reviewed by a qualified GRC professional before use in formal audits or compliance programs.
-          </p>
-        </div>
+            </div>
           )}
-        ({ title, accent, children, onCopy, copied }) {
+
+          <div style={{ marginTop: "2rem", paddingTop: "1rem", borderTop: "1px solid #2a2a2a", textAlign: "center" }}>
+            <p style={{ fontSize: 11, color: "#444", margin: 0, lineHeight: 1.6 }}>
+              Risk Whisperer is a portfolio and educational tool. Outputs should be reviewed by a qualified GRC professional before use in formal audits or compliance programs.
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </>
+  );
+}
+
+function Card({ title, accent, children, onCopy, copied }) {
   const [open, setOpen] = useState(false);
   return (
     <div style={{ background: "#242424", border: "1px solid #333", borderRadius: 12, overflow: "hidden" }}>
