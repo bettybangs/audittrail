@@ -96,7 +96,12 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
-  const [history, setHistory] = useState([]);
+  const [history, setHistory] = useState(() => {
+    try {
+      const saved = localStorage.getItem("rw-history");
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
   const [showHistory, setShowHistory] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [copied, setCopied] = useState("");
@@ -128,7 +133,9 @@ export default function App() {
       var parsed = JSON.parse(text.replace(/```json|```/g, "").trim());
       setResult(parsed);
       setHistory(function(prev) {
-        return [{ input: input.substring(0, 80) + "...", env: env, framework: framework, result: parsed, timestamp: new Date().toLocaleTimeString() }, ...prev.slice(0, 9)];
+        const updated = [{ input: input.substring(0, 80) + "...", env: env, framework: framework, result: parsed, timestamp: new Date().toLocaleTimeString() }, ...prev.slice(0, 9)];
+        try { localStorage.setItem("rw-history", JSON.stringify(updated)); } catch {}
+        return updated;
       });
     } catch (e) {
       if (e.message?.includes("401") || e.message?.includes("invalid x-api-key") || e.message?.includes("authentication")) {
