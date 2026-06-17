@@ -181,9 +181,14 @@ export default function App() {
                 {showHelp ? "Hide help" : "How to use"}
               </button>
               {result && (
+                <>
                 <button onClick={function() { window.print(); }} style={{ background: "none", border: "1px solid #444", color: "#888", fontSize: 12, padding: "4px 12px", borderRadius: 8, cursor: "pointer", fontFamily: "inherit" }}>
                   Export PDF
                 </button>
+                <button onClick={assess} disabled={loading} style={{ background: "none", border: "1px solid #444", color: "#888", fontSize: 12, padding: "4px 12px", borderRadius: 8, cursor: "pointer", fontFamily: "inherit" }}>
+                  Regenerate
+                </button>
+                </>
               )}
               {history.length > 0 && (
                 <button onClick={function() { setShowHistory(!showHistory); setShowHelp(false); }} style={{ background: "none", border: "1px solid #444", color: "#888", fontSize: 12, padding: "4px 12px", borderRadius: 8, cursor: "pointer", fontFamily: "inherit" }}>
