@@ -88,6 +88,9 @@ const styles = `
   @media print { .no-print { display: none !important; } body { background: white !important; color: black !important; } }
 `;
 
+export const config = {
+  maxDuration: 30
+};
 export default function App() {
   const [input, setInput] = useState("");
   const [env, setEnv] = useState("AWS");
