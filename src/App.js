@@ -112,18 +112,15 @@ export default function App() {
     setLoading(true);
     try {
       var familyHint = family !== "Any (Auto-detect)" ? " Focus on the " + family + " control family." : "";
-      var res = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": process.env.REACT_APP_ANTHROPIC_API_KEY,
-          "anthropic-version": "2023-06-01",
-          "anthropic-dangerous-direct-browser-access": "true"
-        },
+      var res = await fetch("/api/assess", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
         body: JSON.stringify({
           model: "claude-sonnet-4-6",
           max_tokens: 4000,
-          system: "You are a senior GRC analyst and security control assessor specializing in " + env + " cloud environments and " + framework + " compliance." + familyHint + " Return ONLY valid JSON (no markdown, no backticks) with these exact keys: assessmentQuestions (array of 6-8 specific interview questions an auditor would ask), evidenceToCollect (array of 6-8 specific artifacts/screenshots/logs to request), potentialWeaknesses (array of 4-6 objects with {name, description, severity, recommendation} where severity is High/Medium/Low), nistControls (array of 5-8 objects with {id, name, rationale}), overallRiskScore (a number 1-10 where 10 is highest risk), riskJustification (2-3 sentence explanation of the score), controlMaturity (one of: Initial/Developing/Defined/Managed/Optimizing), maturityJustification (1-2 sentence explanation). Be specific to " + env + " services and " + framework + " requirements.",
+          system: "You are a senior GRC analyst and security control assessor specializing in " + env + " cloud environments and " + framework + " compliance." + familyHint + " Return ONLY valid JSON (no markdown, no backticks) with these exact keys: assessmentQuestions (array of 6-8 specific interview questions an auditor would ask), assessmentQuestionsPlain (array of the same questions rewritten in plain language for a non-technical business audience, no jargon or control IDs), evidenceToCollect (array of 6-8 specific artifacts/screenshots/logs to request), evidenceToCollectPlain (array of the same evidence items rewritten in plain language a business stakeholder would understand), potentialWeaknesses (array of 4-6 objects with {name, description, severity, recommendation} where severity is High/Medium/Low), potentialWeaknessesPlain (array of the same weaknesses as objects with {name, description, severity, recommendation} rewritten in plain business language explaining business risk and impact, no technical jargon), nistControls (array of 5-8 objects with {id, name, rationale}), overallRiskScore (a number 1-10 where 10 is highest risk), riskJustification (2-3 sentence explanation of the score), riskJustificationPlain (same risk explanation rewritten for a business executive with no GRC background), controlMaturity (one of: Initial/Developing/Defined/Managed/Optimizing), maturityJustification (1-2 sentence explanation), maturityJustificationPlain (same maturity explanation in plain business language). Be specific to " + env + " services and " + framework + " requirements.",
           messages: [{ role: "user", content: "Assess this security control:\n\n" + input }]
         })
       });
@@ -340,6 +337,18 @@ export default function App() {
           )}
 
           {result && (
+            <div style={{ display: "flex", gap: 8, marginBottom: "1rem" }}>
+    <button
+      onClick={() => setViewMode("tech")}
+      style={{ padding: "6px 18px", borderRadius: 99, fontSize: 12, fontWeight: 700, cursor: "pointer", border: viewMode === "tech" ? "1px solid #6eccc0" : "1px solid #444", background: viewMode === "tech" ? "#1a2e2c" : "none", color: viewMode === "tech" ? "#6eccc0" : "#666", fontFamily: "inherit" }}>
+      🔬 Tech Talk
+    </button>
+    <button
+      onClick={() => setViewMode("plain")}
+      style={{ padding: "6px 18px", borderRadius: 99, fontSize: 12, fontWeight: 700, cursor: "pointer", border: viewMode === "plain" ? "1px solid #c8a830" : "1px solid #444", background: viewMode === "plain" ? "#1a1400" : "none", color: viewMode === "plain" ? "#c8a830" : "#666", fontFamily: "inherit" }}>
+      💼 Business View
+    </button>
+  </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
                 <div style={{ background: "#242424", border: "1px solid #333", borderRadius: 12, padding: "1.25rem" }}>
@@ -348,33 +357,33 @@ export default function App() {
                     <span style={{ fontSize: 48, fontWeight: 700, color: riskColor, lineHeight: 1 }}>{result.overallRiskScore}</span>
                     <span style={{ fontSize: 16, color: "#444" }}>/10</span>
                   </div>
-                  <p style={{ fontSize: 12, color: "#777", margin: "0.5rem 0 0", lineHeight: 1.6 }}>{result.riskJustification}</p>
+                  <p style={{ fontSize: 12, color: "#777", margin: "0.5rem 0 0", lineHeight: 1.6 }}>{viewMode === "tech" ? result.riskJustification : result.riskJustificationPlain}</p>
                 </div>
                 <div style={{ background: "#242424", border: "1px solid #333", borderRadius: 12, padding: "1.25rem" }}>
                   <p style={{ fontSize: 11, fontWeight: 700, color: "#555", letterSpacing: "0.08em", margin: "0 0 0.5rem" }}>CONTROL MATURITY</p>
                   <span style={{ fontSize: 28, fontWeight: 700, color: maturityColors[result.controlMaturity] || "#6eccc0" }}>{result.controlMaturity}</span>
-                  <p style={{ fontSize: 12, color: "#777", margin: "0.5rem 0 0", lineHeight: 1.6 }}>{result.maturityJustification}</p>
+                  <p style={{ fontSize: 12, color: "#777", margin: "0.5rem 0 0", lineHeight: 1.6 }}>{viewMode === "tech" ? result.maturityJustification : result.maturityJustificationPlain}</p>
                 </div>
               </div>
 
-              <Card title="Assessment questions" accent="#d4902a" onCopy={function() { copySection(result.assessmentQuestions.join("\n"), "questions"); }} copied={copied === "questions"}>
-                <ul style={{ paddingLeft: "1.25rem", display: "flex", flexDirection: "column", gap: 8 }}>
-                  {result.assessmentQuestions.map(function(q, i) {
-                    return <li key={i} style={{ fontSize: 13, lineHeight: 1.7, color: "#d8c8a8" }}>{q}</li>;
-                  })}
-                </ul>
-              </Card>
+              <Card title="Assessment questions" accent="#d4902a" onCopy={function() { copySection((viewMode === "tech" ? result.assessmentQuestions : result.assessmentQuestionsPlain).join("\n"), "questions"); }} copied={copied === "questions"}>
+  <ul style={{ paddingLeft: "1.25rem", display: "flex", flexDirection: "column", gap: 8 }}>
+    {(viewMode === "tech" ? result.assessmentQuestions : result.assessmentQuestionsPlain).map(function(q, i) {
+      return <li key={i} style={{ fontSize: 13, lineHeight: 1.7, color: "#d8c8a8" }}>{q}</li>;
+    })}
+  </ul>
+</Card>
 
-              <Card title="Evidence to collect" accent="#6eccc0" onCopy={function() { copySection(result.evidenceToCollect.join("\n"), "evidence"); }} copied={copied === "evidence"}>
-                <ul style={{ paddingLeft: "1.25rem", display: "flex", flexDirection: "column", gap: 8 }}>
-                  {result.evidenceToCollect.map(function(e, i) {
-                    return <li key={i} style={{ fontSize: 13, lineHeight: 1.7, color: "#d8c8a8" }}>{e}</li>;
-                  })}
-                </ul>
-              </Card>
+             <Card title="Evidence to collect" accent="#6eccc0" onCopy={function() { copySection((viewMode === "tech" ? result.evidenceToCollect : result.evidenceToCollectPlain).join("\n"), "evidence"); }} copied={copied === "evidence"}>
+  <ul style={{ paddingLeft: "1.25rem", display: "flex", flexDirection: "column", gap: 8 }}>
+    {(viewMode === "tech" ? result.evidenceToCollect : result.evidenceToCollectPlain).map(function(e, i) {
+      return <li key={i} style={{ fontSize: 13, lineHeight: 1.7, color: "#d8c8a8" }}>{e}</li>;
+    })}
+  </ul>
+</Card>
 
               <Card title="Potential weaknesses & recommendations" accent="#e07030" onCopy={function() { copySection(result.potentialWeaknesses.map(function(w) { return w.name + " (" + w.severity + "): " + w.description + " Recommendation: " + w.recommendation; }).join("\n\n"), "weaknesses"); }} copied={copied === "weaknesses"}>
-                {result.potentialWeaknesses.map(function(w, i) {
+                {(viewMode === "tech" ? result.potentialWeaknesses : result.potentialWeaknessesPlain).map(function(w, i) {
                   var sevBg = w.severity === "High" ? "#3a1a0a" : w.severity === "Medium" ? "#2a2a0a" : "#0a2a2a";
                   var sevColor = w.severity === "High" ? "#e07030" : w.severity === "Medium" ? "#c8a830" : "#50b8b0";
                   var sevBorder = w.severity === "High" ? "#7a3a10" : w.severity === "Medium" ? "#6a5a10" : "#1a6a60";
