@@ -105,6 +105,7 @@ export default function App() {
   const [showHistory, setShowHistory] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [copied, setCopied] = useState("");
+  const [viewMode, setViewMode] = useState("tech");
 
   async function assess() {
     setError("");
@@ -113,10 +114,10 @@ export default function App() {
     try {
       var familyHint = family !== "Any (Auto-detect)" ? " Focus on the " + family + " control family." : "";
       var res = await fetch("/api/assess", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
           model: "claude-sonnet-4-6",
           max_tokens: 4000,
@@ -136,7 +137,7 @@ export default function App() {
       });
     } catch (e) {
       if (e.message?.includes("401") || e.message?.includes("invalid x-api-key") || e.message?.includes("authentication")) {
-        setError("Invalid API key. Check your REACT_APP_SANTHROPIC_API_KEY in .env");
+        setError("Invalid API key. Check your ANTHROPIC_API_KEY in Vercel environment variables.");
       } else if (e.message?.includes("429") || e.message?.includes("rate")) {
         setError("Rate limit hit. Wait 30 seconds and try again.");
       } else if (e.message?.includes("fetch") || e.message?.includes("network") || e.message?.includes("Failed")) {
@@ -179,12 +180,12 @@ export default function App() {
               </button>
               {result && (
                 <>
-                <button onClick={function() { window.print(); }} style={{ background: "none", border: "1px solid #444", color: "#888", fontSize: 12, padding: "4px 12px", borderRadius: 8, cursor: "pointer", fontFamily: "inherit" }}>
-                  Export PDF
-                </button>
-                <button onClick={assess} disabled={loading} style={{ background: "none", border: "1px solid #444", color: "#888", fontSize: 12, padding: "4px 12px", borderRadius: 8, cursor: "pointer", fontFamily: "inherit" }}>
-                  Regenerate
-                </button>
+                  <button onClick={function() { window.print(); }} style={{ background: "none", border: "1px solid #444", color: "#888", fontSize: 12, padding: "4px 12px", borderRadius: 8, cursor: "pointer", fontFamily: "inherit" }}>
+                    Export PDF
+                  </button>
+                  <button onClick={assess} disabled={loading} style={{ background: "none", border: "1px solid #444", color: "#888", fontSize: 12, padding: "4px 12px", borderRadius: 8, cursor: "pointer", fontFamily: "inherit" }}>
+                    Regenerate
+                  </button>
                 </>
               )}
               {history.length > 0 && (
@@ -337,88 +338,92 @@ export default function App() {
           )}
 
           {result && (
-            <div style={{ display: "flex", gap: 8, marginBottom: "1rem" }}>
-    <button
-      onClick={() => setViewMode("tech")}
-      style={{ padding: "6px 18px", borderRadius: 99, fontSize: 12, fontWeight: 700, cursor: "pointer", border: viewMode === "tech" ? "1px solid #6eccc0" : "1px solid #444", background: viewMode === "tech" ? "#1a2e2c" : "none", color: viewMode === "tech" ? "#6eccc0" : "#666", fontFamily: "inherit" }}>
-      🔬 Tech Talk
-    </button>
-    <button
-      onClick={() => setViewMode("plain")}
-      style={{ padding: "6px 18px", borderRadius: 99, fontSize: 12, fontWeight: 700, cursor: "pointer", border: viewMode === "plain" ? "1px solid #c8a830" : "1px solid #444", background: viewMode === "plain" ? "#1a1400" : "none", color: viewMode === "plain" ? "#c8a830" : "#666", fontFamily: "inherit" }}>
-      💼 Business View
-    </button>
-  </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
-                <div style={{ background: "#242424", border: "1px solid #333", borderRadius: 12, padding: "1.25rem" }}>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: "#555", letterSpacing: "0.08em", margin: "0 0 0.5rem" }}>OVERALL RISK SCORE</p>
-                  <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-                    <span style={{ fontSize: 48, fontWeight: 700, color: riskColor, lineHeight: 1 }}>{result.overallRiskScore}</span>
-                    <span style={{ fontSize: 16, color: "#444" }}>/10</span>
-                  </div>
-                  <p style={{ fontSize: 12, color: "#777", margin: "0.5rem 0 0", lineHeight: 1.6 }}>{viewMode === "tech" ? result.riskJustification : result.riskJustificationPlain}</p>
-                </div>
-                <div style={{ background: "#242424", border: "1px solid #333", borderRadius: 12, padding: "1.25rem" }}>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: "#555", letterSpacing: "0.08em", margin: "0 0 0.5rem" }}>CONTROL MATURITY</p>
-                  <span style={{ fontSize: 28, fontWeight: 700, color: maturityColors[result.controlMaturity] || "#6eccc0" }}>{result.controlMaturity}</span>
-                  <p style={{ fontSize: 12, color: "#777", margin: "0.5rem 0 0", lineHeight: 1.6 }}>{viewMode === "tech" ? result.maturityJustification : result.maturityJustificationPlain}</p>
-                </div>
+            <>
+              <div style={{ display: "flex", gap: 8, marginBottom: "1rem" }} className="no-print">
+                <button
+                  onClick={() => setViewMode("tech")}
+                  style={{ padding: "6px 18px", borderRadius: 99, fontSize: 12, fontWeight: 700, cursor: "pointer", border: viewMode === "tech" ? "1px solid #6eccc0" : "1px solid #444", background: viewMode === "tech" ? "#1a2e2c" : "none", color: viewMode === "tech" ? "#6eccc0" : "#666", fontFamily: "inherit" }}>
+                  🔬 Tech Talk
+                </button>
+                <button
+                  onClick={() => setViewMode("plain")}
+                  style={{ padding: "6px 18px", borderRadius: 99, fontSize: 12, fontWeight: 700, cursor: "pointer", border: viewMode === "plain" ? "1px solid #c8a830" : "1px solid #444", background: viewMode === "plain" ? "#1a1400" : "none", color: viewMode === "plain" ? "#c8a830" : "#666", fontFamily: "inherit" }}>
+                  💼 Business View
+                </button>
               </div>
 
-              <Card title="Assessment questions" accent="#d4902a" onCopy={function() { copySection((viewMode === "tech" ? result.assessmentQuestions : result.assessmentQuestionsPlain).join("\n"), "questions"); }} copied={copied === "questions"}>
-  <ul style={{ paddingLeft: "1.25rem", display: "flex", flexDirection: "column", gap: 8 }}>
-    {(viewMode === "tech" ? result.assessmentQuestions : result.assessmentQuestionsPlain).map(function(q, i) {
-      return <li key={i} style={{ fontSize: 13, lineHeight: 1.7, color: "#d8c8a8" }}>{q}</li>;
-    })}
-  </ul>
-</Card>
-
-             <Card title="Evidence to collect" accent="#6eccc0" onCopy={function() { copySection((viewMode === "tech" ? result.evidenceToCollect : result.evidenceToCollectPlain).join("\n"), "evidence"); }} copied={copied === "evidence"}>
-  <ul style={{ paddingLeft: "1.25rem", display: "flex", flexDirection: "column", gap: 8 }}>
-    {(viewMode === "tech" ? result.evidenceToCollect : result.evidenceToCollectPlain).map(function(e, i) {
-      return <li key={i} style={{ fontSize: 13, lineHeight: 1.7, color: "#d8c8a8" }}>{e}</li>;
-    })}
-  </ul>
-</Card>
-
-              <Card title="Potential weaknesses & recommendations" accent="#e07030" onCopy={function() { copySection(result.potentialWeaknesses.map(function(w) { return w.name + " (" + w.severity + "): " + w.description + " Recommendation: " + w.recommendation; }).join("\n\n"), "weaknesses"); }} copied={copied === "weaknesses"}>
-                {(viewMode === "tech" ? result.potentialWeaknesses : result.potentialWeaknessesPlain).map(function(w, i) {
-                  var sevBg = w.severity === "High" ? "#3a1a0a" : w.severity === "Medium" ? "#2a2a0a" : "#0a2a2a";
-                  var sevColor = w.severity === "High" ? "#e07030" : w.severity === "Medium" ? "#c8a830" : "#50b8b0";
-                  var sevBorder = w.severity === "High" ? "#7a3a10" : w.severity === "Medium" ? "#6a5a10" : "#1a6a60";
-                  return (
-                    <div key={i} style={{ padding: "0.75rem 0", borderBottom: i < result.potentialWeaknesses.length - 1 ? "1px solid #2a2a2a" : "none" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                        <span style={{ fontSize: 13, fontWeight: 600, color: "#f5ead8" }}>{w.name}</span>
-                        <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 10px", borderRadius: 99, background: sevBg, color: sevColor, border: "1px solid " + sevBorder, marginLeft: "auto" }}>{w.severity}</span>
-                      </div>
-                      <p style={{ fontSize: 12, color: "#888", lineHeight: 1.6, margin: "0 0 6px" }}>{w.description}</p>
-                      <p style={{ fontSize: 12, color: "#6eccc0", lineHeight: 1.6, margin: 0 }}><strong style={{ color: "#6eccc0" }}>Recommendation: </strong>{w.recommendation}</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+                  <div style={{ background: "#242424", border: "1px solid #333", borderRadius: 12, padding: "1.25rem" }}>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: "#555", letterSpacing: "0.08em", margin: "0 0 0.5rem" }}>OVERALL RISK SCORE</p>
+                    <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                      <span style={{ fontSize: 48, fontWeight: 700, color: riskColor, lineHeight: 1 }}>{result.overallRiskScore}</span>
+                      <span style={{ fontSize: 16, color: "#444" }}>/10</span>
                     </div>
-                  );
-                })}
-              </Card>
-
-              <Card title={framework + " control mappings"} accent="#c8a830" onCopy={function() { copySection(result.nistControls.map(function(c) { return c.id + " - " + c.name + ": " + c.rationale; }).join("\n\n"), "controls"); }} copied={copied === "controls"}>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
-                  {result.nistControls.map(function(c, i) {
-                    return (
-                      <a key={i} className="nist-tag" href={"https://csrc.nist.gov/projects/cprt/catalog#/cprt/framework/version/SP_800_53_5_1_0/home?element=" + c.id} target="_blank" rel="noreferrer">{c.id}</a>
-                    );
-                  })}
+                    <p style={{ fontSize: 12, color: "#777", margin: "0.5rem 0 0", lineHeight: 1.6 }}>{viewMode === "tech" ? result.riskJustification : result.riskJustificationPlain}</p>
+                  </div>
+                  <div style={{ background: "#242424", border: "1px solid #333", borderRadius: 12, padding: "1.25rem" }}>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: "#555", letterSpacing: "0.08em", margin: "0 0 0.5rem" }}>CONTROL MATURITY</p>
+                    <span style={{ fontSize: 28, fontWeight: 700, color: maturityColors[result.controlMaturity] || "#6eccc0" }}>{result.controlMaturity}</span>
+                    <p style={{ fontSize: 12, color: "#777", margin: "0.5rem 0 0", lineHeight: 1.6 }}>{viewMode === "tech" ? result.maturityJustification : result.maturityJustificationPlain}</p>
+                  </div>
                 </div>
-                <ul style={{ paddingLeft: "1.25rem", display: "flex", flexDirection: "column", gap: 8 }}>
-                  {result.nistControls.map(function(c, i) {
+
+                <Card title="Assessment questions" accent="#d4902a" onCopy={function() { copySection((viewMode === "tech" ? result.assessmentQuestions : result.assessmentQuestionsPlain).join("\n"), "questions"); }} copied={copied === "questions"}>
+                  <ul style={{ paddingLeft: "1.25rem", display: "flex", flexDirection: "column", gap: 8 }}>
+                    {(viewMode === "tech" ? result.assessmentQuestions : result.assessmentQuestionsPlain).map(function(q, i) {
+                      return <li key={i} style={{ fontSize: 13, lineHeight: 1.7, color: "#d8c8a8" }}>{q}</li>;
+                    })}
+                  </ul>
+                </Card>
+
+                <Card title="Evidence to collect" accent="#6eccc0" onCopy={function() { copySection((viewMode === "tech" ? result.evidenceToCollect : result.evidenceToCollectPlain).join("\n"), "evidence"); }} copied={copied === "evidence"}>
+                  <ul style={{ paddingLeft: "1.25rem", display: "flex", flexDirection: "column", gap: 8 }}>
+                    {(viewMode === "tech" ? result.evidenceToCollect : result.evidenceToCollectPlain).map(function(e, i) {
+                      return <li key={i} style={{ fontSize: 13, lineHeight: 1.7, color: "#d8c8a8" }}>{e}</li>;
+                    })}
+                  </ul>
+                </Card>
+
+                <Card title="Potential weaknesses & recommendations" accent="#e07030" onCopy={function() { copySection((viewMode === "tech" ? result.potentialWeaknesses : result.potentialWeaknessesPlain).map(function(w) { return w.name + " (" + w.severity + "): " + w.description + " Recommendation: " + w.recommendation; }).join("\n\n"), "weaknesses"); }} copied={copied === "weaknesses"}>
+                  {(viewMode === "tech" ? result.potentialWeaknesses : result.potentialWeaknessesPlain).map(function(w, i) {
+                    var arr = viewMode === "tech" ? result.potentialWeaknesses : result.potentialWeaknessesPlain;
+                    var sevBg = w.severity === "High" ? "#3a1a0a" : w.severity === "Medium" ? "#2a2a0a" : "#0a2a2a";
+                    var sevColor = w.severity === "High" ? "#e07030" : w.severity === "Medium" ? "#c8a830" : "#50b8b0";
+                    var sevBorder = w.severity === "High" ? "#7a3a10" : w.severity === "Medium" ? "#6a5a10" : "#1a6a60";
                     return (
-                      <li key={i} style={{ fontSize: 13, lineHeight: 1.7, color: "#d8c8a8" }}>
-                        <strong style={{ color: "#f5ead8" }}>{c.id} - {c.name}:</strong> {c.rationale}
-                      </li>
+                      <div key={i} style={{ padding: "0.75rem 0", borderBottom: i < arr.length - 1 ? "1px solid #2a2a2a" : "none" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                          <span style={{ fontSize: 13, fontWeight: 600, color: "#f5ead8" }}>{w.name}</span>
+                          <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 10px", borderRadius: 99, background: sevBg, color: sevColor, border: "1px solid " + sevBorder, marginLeft: "auto" }}>{w.severity}</span>
+                        </div>
+                        <p style={{ fontSize: 12, color: "#888", lineHeight: 1.6, margin: "0 0 6px" }}>{w.description}</p>
+                        <p style={{ fontSize: 12, color: "#6eccc0", lineHeight: 1.6, margin: 0 }}><strong style={{ color: "#6eccc0" }}>Recommendation: </strong>{w.recommendation}</p>
+                      </div>
                     );
                   })}
-                </ul>
-              </Card>
-            </div>
+                </Card>
+
+                <Card title={framework + " control mappings"} accent="#c8a830" onCopy={function() { copySection(result.nistControls.map(function(c) { return c.id + " - " + c.name + ": " + c.rationale; }).join("\n\n"), "controls"); }} copied={copied === "controls"}>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
+                    {result.nistControls.map(function(c, i) {
+                      return (
+                        <a key={i} className="nist-tag" href={"https://csrc.nist.gov/projects/cprt/catalog#/cprt/framework/version/SP_800_53_5_1_0/home?element=" + c.id} target="_blank" rel="noreferrer">{c.id}</a>
+                      );
+                    })}
+                  </div>
+                  <ul style={{ paddingLeft: "1.25rem", display: "flex", flexDirection: "column", gap: 8 }}>
+                    {result.nistControls.map(function(c, i) {
+                      return (
+                        <li key={i} style={{ fontSize: 13, lineHeight: 1.7, color: "#d8c8a8" }}>
+                          <strong style={{ color: "#f5ead8" }}>{c.id} - {c.name}:</strong> {c.rationale}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </Card>
+              </div>
+            </>
           )}
 
           <div style={{ marginTop: "2rem", paddingTop: "1rem", borderTop: "1px solid #2a2a2a", textAlign: "center" }}>
