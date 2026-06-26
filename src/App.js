@@ -359,13 +359,8 @@ export default function App() {
             <button onClick={assess} disabled={loading || !input.trim()} className="assess-btn"
               style={{ width: "100%", marginTop: 12, padding: "0.75rem", borderRadius: 8, fontSize: 14, cursor: "pointer" }}>
               {loading ? (
-                <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>
-                  Analyzing control
-                  <span className="dot1" style={{ fontSize: 18, lineHeight: 1 }}>.</span>
-                  <span className="dot2" style={{ fontSize: 18, lineHeight: 1 }}>.</span>
-                  <span className="dot3" style={{ fontSize: 18, lineHeight: 1 }}>.</span>
-                </span>
-              ) : "Assess control"}
+  <LoadingMessage />
+) : "Assess control"}
             </button>
           </div>
 
@@ -475,7 +470,31 @@ export default function App() {
     </>
   );
 }
-
+function LoadingMessage() {
+  const messages = [
+    "Reviewing control description...",
+    "Analyzing compliance gaps...",
+    "Identifying potential weaknesses...",
+    "Mapping framework controls...",
+    "Generating assessment questions...",
+    "Calculating risk score...",
+    "Preparing evidence checklist...",
+    "Finalizing recommendations..."
+  ];
+  const [index, setIndex] = useState(0);
+  useState(() => {
+    const interval = setInterval(() => {
+      setIndex(prev => (prev + 1) % messages.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+  return (
+    <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+      <span className="dot1" style={{ fontSize: 18, lineHeight: 1 }}>⏳</span>
+      {messages[index]}
+    </span>
+  );
+}
 function Card({ title, accent, children, onCopy, copied }) {
   const [open, setOpen] = useState(false);
   return (
