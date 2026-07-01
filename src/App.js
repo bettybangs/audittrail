@@ -281,11 +281,18 @@ parsed.potentialWeaknesses = parsed.potentialWeaknesses.map(function(w, i) {
                     <p style={{ fontSize: 12, color: "#777", margin: 0, lineHeight: 1.6 }}>Risk Whisperer will analyze your control and return results in about 10-15 seconds.</p>
                   </div>
                 </div>
-                <div className="help-step">
+               <div className="help-step">
                   <div className="step-num">4</div>
                   <div>
                     <p style={{ fontSize: 13, color: "#f5ead8", margin: "0 0 2px", fontWeight: 600 }}>Review and export your results</p>
                     <p style={{ fontSize: 12, color: "#777", margin: 0, lineHeight: 1.6 }}>Use the Copy buttons to grab individual sections, or Export PDF to save the full report. Past assessments are saved in History.</p>
+                  </div>
+                </div>
+                <div className="help-step">
+                  <div className="step-num">5</div>
+                  <div>
+                    <p style={{ fontSize: 13, color: "#f5ead8", margin: "0 0 2px", fontWeight: 600 }}>Track remediation with POA&M</p>
+                    <p style={{ fontSize: 12, color: "#777", margin: 0, lineHeight: 1.6 }}>Under each identified weakness, assign an owner, set a target remediation date, and track status (Open, In Progress, Closed, Deferred). Your entries save automatically and persist across sessions.</p>
                   </div>
                 </div>
               </div>
