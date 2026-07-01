@@ -85,7 +85,8 @@ const styles = `
   .step-num { width: 22px; height: 22px; border-radius: 50%; background: #c17f3a; color: #1a1400; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
   @keyframes spin { 0%{opacity:1} 33%{opacity:0.3} 66%{opacity:0.3} 100%{opacity:1} }
   .dot1{animation:spin 1.2s infinite} .dot2{animation:spin 1.2s 0.4s infinite} .dot3{animation:spin 1.2s 0.8s infinite}
-  @media print { .no-print { display: none !important; } body { background: white !important; color: black !important; } }
+ @media print { .no-print { display: none !important; } body { background: white !important; color: black !important; } .poam-row { border-color: #ccc !important; } }
+  .poam-row input, .poam-row select { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 `;
 
 export default function App() {
@@ -104,6 +105,20 @@ export default function App() {
       return saved ? JSON.parse(saved) : [];
     } catch { return []; }
   });
+  const [poam, setPoam] = useState(() => {
+  try {
+    const saved = localStorage.getItem("rw-poam");
+    return saved ? JSON.parse(saved) : {};
+  } catch { return {}; }
+});
+
+function updatePoam(weaknessId, field, value) {
+  setPoam(prev => {
+    const updated = { ...prev, [weaknessId]: { ...prev[weaknessId], [field]: value } };
+    try { localStorage.setItem("rw-poam", JSON.stringify(updated)); } catch {}
+    return updated;
+  });
+}
   const [showHistory, setShowHistory] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [copied, setCopied] = useState("");
@@ -131,6 +146,9 @@ export default function App() {
       if (data.error) throw new Error(data.error.message);
       var text = data.content.find(function(b) { return b.type === "text"; })?.text || "";
       var parsed = JSON.parse(text.replace(/```json|```/g, "").trim());
+parsed.potentialWeaknesses = parsed.potentialWeaknesses.map(function(w, i) {
+  return { ...w, id: framework + "-" + env + "-" + i + "-" + Date.now() };
+});
       setResult(parsed);
       setHistory(function(prev) {
         const updated = [{ input: input.substring(0, 80) + "...", env: env, framework: framework, result: parsed, timestamp: new Date().toLocaleTimeString() }, ...prev.slice(0, 9)];
@@ -419,23 +437,60 @@ export default function App() {
                   </ul>
                 </Card>
 
-                <Card title="Potential weaknesses & recommendations" accent="#e07030" onCopy={function() { copySection((weaknesses || []).map(function(w) { return w.name + " (" + w.severity + "): " + w.description + " Recommendation: " + w.recommendation; }).join("\n\n"), "weaknesses"); }} copied={copied === "weaknesses"}>
-                  {(weaknesses || []).map(function(w, i) {
-                    var sevBg = w.severity === "High" ? "#3a1a0a" : w.severity === "Medium" ? "#2a2a0a" : "#0a2a2a";
-                    var sevColor = w.severity === "High" ? "#e07030" : w.severity === "Medium" ? "#c8a830" : "#50b8b0";
-                    var sevBorder = w.severity === "High" ? "#7a3a10" : w.severity === "Medium" ? "#6a5a10" : "#1a6a60";
-                    return (
-                      <div key={i} style={{ padding: "0.75rem 0", borderBottom: i < (weaknesses || []).length - 1 ? "1px solid #2a2a2a" : "none" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                          <span style={{ fontSize: 13, fontWeight: 600, color: "#f5ead8" }}>{w.name}</span>
-                          <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 10px", borderRadius: 99, background: sevBg, color: sevColor, border: "1px solid " + sevBorder, marginLeft: "auto" }}>{w.severity}</span>
-                        </div>
-                        <p style={{ fontSize: 12, color: "#888", lineHeight: 1.6, margin: "0 0 6px" }}>{w.description}</p>
-                        <p style={{ fontSize: 12, color: "#6eccc0", lineHeight: 1.6, margin: 0 }}><strong style={{ color: "#6eccc0" }}>Recommendation: </strong>{w.recommendation}</p>
-                      </div>
-                    );
-                  })}
-                </Card>
+ <Card title="Potential weaknesses & recommendations" accent="#e07030" onCopy={function() { copySection((weaknesses || []).map(function(w) { return w.name + " (" + w.severity + "): " + w.description + " Recommendation: " + w.recommendation; }).join("\n\n"), "weaknesses"); }} copied={copied === "weaknesses"}>
+  {(weaknesses || []).map(function(w, i) {
+    var sevBg = w.severity === "High" ? "#3a1a0a" : w.severity === "Medium" ? "#2a2a0a" : "#0a2a2a";
+    var sevColor = w.severity === "High" ? "#e07030" : w.severity === "Medium" ? "#c8a830" : "#50b8b0";
+    var sevBorder = w.severity === "High" ? "#7a3a10" : w.severity === "Medium" ? "#6a5a10" : "#1a6a60";
+    var wId = w.id || i;
+    var entry = poam[wId] || {};
+    return (
+      <div key={i} style={{ padding: "0.75rem 0", borderBottom: i < (weaknesses || []).length - 1 ? "1px solid #2a2a2a" : "none" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: "#f5ead8" }}>{w.name}</span>
+          <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 10px", borderRadius: 99, background: sevBg, color: sevColor, border: "1px solid " + sevBorder, marginLeft: "auto" }}>{w.severity}</span>
+        </div>
+        <p style={{ fontSize: 12, color: "#888", lineHeight: 1.6, margin: "0 0 6px" }}>{w.description}</p>
+        <p style={{ fontSize: 12, color: "#6eccc0", lineHeight: 1.6, margin: "0 0 12px" }}><strong style={{ color: "#6eccc0" }}>Recommendation: </strong>{w.recommendation}</p>
+
+        {/* POA&M Fields */}
+        <div style={{ background: "#1a1a1a", border: "1px solid #2a2a2a", borderRadius: 8, padding: "0.75rem", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }} className="poam-row">
+          <div>
+            <label style={{ fontSize: 10, color: "#c17f3a", fontWeight: 700, letterSpacing: "0.08em", display: "block", marginBottom: 4 }}>STATUS</label>
+            <select
+              value={entry.status || "Open"}
+              onChange={function(e) { updatePoam(wId, "status", e.target.value); }}
+              style={{ width: "100%", background: "#141414", border: "1px solid #333", color: "#f5ead8", borderRadius: 6, padding: "4px 8px", fontSize: 12, fontFamily: "inherit" }}>
+              <option>Open</option>
+              <option>In Progress</option>
+              <option>Closed</option>
+              <option>Deferred</option>
+            </select>
+          </div>
+          <div>
+            <label style={{ fontSize: 10, color: "#c17f3a", fontWeight: 700, letterSpacing: "0.08em", display: "block", marginBottom: 4 }}>OWNER</label>
+            <input
+              type="text"
+              placeholder="Assign owner..."
+              value={entry.owner || ""}
+              onChange={function(e) { updatePoam(wId, "owner", e.target.value); }}
+              style={{ width: "100%", background: "#141414", border: "1px solid #333", color: "#f5ead8", borderRadius: 6, padding: "4px 8px", fontSize: 12, fontFamily: "inherit", boxSizing: "border-box" }}
+            />
+          </div>
+          <div>
+            <label style={{ fontSize: 10, color: "#c17f3a", fontWeight: 700, letterSpacing: "0.08em", display: "block", marginBottom: 4 }}>TARGET DATE</label>
+            <input
+              type="date"
+              value={entry.dueDate || ""}
+              onChange={function(e) { updatePoam(wId, "dueDate", e.target.value); }}
+              style={{ width: "100%", background: "#141414", border: "1px solid #333", color: "#f5ead8", borderRadius: 6, padding: "4px 8px", fontSize: 12, fontFamily: "inherit", boxSizing: "border-box" }}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  })}
+</Card>
 
                 <Card title={framework + " control mappings"} accent="#c8a830" onCopy={function() { copySection(result.nistControls.map(function(c) { return c.id + " - " + c.name + ": " + c.rationale; }).join("\n\n"), "controls"); }} copied={copied === "controls"}>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
